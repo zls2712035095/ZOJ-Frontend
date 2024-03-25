@@ -53,6 +53,7 @@ console.log();
 setTimeout(() => {
   store.dispatch("user/getLoginUser", {
     userName: "zackzhang",
+    role: "admin",
   });
 }, 3000);
 const doMenuClick = (key: string) => {
