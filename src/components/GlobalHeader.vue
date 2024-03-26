@@ -16,7 +16,7 @@
             <div class="title">ZOJ</div>
           </div>
         </a-menu-item>
-        <a-menu-item v-for="item in routes" :key="item.path">
+        <a-menu-item v-for="item in visibleRouts" :key="item.path">
           {{ item.name }}
         </a-menu-item>
       </a-menu>
@@ -36,6 +36,15 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 
 const router = useRouter();
+
+//展示在菜单的路由数组
+const visibleRouts = routes.filter((item, index) => {
+  if (item.meta?.hideInMenu) {
+    return false;
+  }
+  return true;
+});
+
 //默认主页
 const selectedKeys = ref(["/"]);
 //路由跳转时，更新选中的菜单项
