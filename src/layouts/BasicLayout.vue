@@ -1,6 +1,6 @@
 <template>
   <div id="basicLayout">
-    <a-layout style="height: 400px">
+    <a-layout style="height: 100vh">
       <a-layout-header class="header">
         <global-header />
       </a-layout-header>
@@ -8,7 +8,7 @@
         <router-view />
       </a-layout-content>
       <a-layout-footer class="footer">
-        <a href="https://baidu.com"> ZOJ BY zls </a>
+        <a href="https://baidu.com" target="_blank"> ZOJ BY zls </a>
       </a-layout-footer>
     </a-layout>
   </div>
@@ -26,12 +26,13 @@
 #basicLayout .content {
   background: linear-gradient(to right, #bbb, #fff);
   margin-bottom: 16px;
+  padding: 20px;
 }
 
 #basicLayout .footer {
   background: #efefef;
   padding: 16px;
-  position: absolute;
+  position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
