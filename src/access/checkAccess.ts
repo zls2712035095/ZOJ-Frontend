@@ -8,7 +8,7 @@ import ACCESS_ENUM from "@/access/ACCESS_ENUM";
  */
 const checkAccess = (loginUser: any, needAccess = ACCESS_ENUM.NOT_LOGIN) => {
   //获取当前登录用户具有的权限（如果没有loginUser，则表示未登录）
-  const loginUserAccess = loginUser?.userRole ?? needAccess;
+  const loginUserAccess = loginUser?.userRole ?? ACCESS_ENUM.NOT_LOGIN;
   if (needAccess === ACCESS_ENUM.NOT_LOGIN) {
     return true;
   }
