@@ -6,6 +6,7 @@ import ACCESS_ENUM from "@/access/ACCESS_ENUM";
 import UserLayout from "@/layouts/UserLayout.vue";
 import UserLoginView from "@/views/user/UserLoginView.vue";
 import UserRegisterView from "@/views/user/UserRegisterView.vue";
+
 export const routes: Array<RouteRecordRaw> = [
   // todo 嵌套路由改造 -》嵌套菜单
   {
