@@ -31,7 +31,10 @@ openapi --input http://localhost:8081/api/v2/api-docs --output ./generated --cli
 ```
 git config --global core.autocrlf false
 ```
-
-
+### 添加了Monaco Editor
+```
+npm install monaco-editor
+https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md
+```
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
