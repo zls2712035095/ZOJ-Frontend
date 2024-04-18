@@ -14,43 +14,34 @@
       <a-input-tag v-model="form.tags" placeholder="请选择标签" allow-clear />
     </a-form-item>
     <a-form-item label="题目限制" :content-flex="false" :merge-props="false">
-      <a-space direction="vertical">
-        <a-form-item
-          field="judgeConfig.timeLimit"
-          label="时间限制"
-          style="min-width: 480px"
-        >
+      <a-space direction="vertical" style="min-width: 480px">
+        <a-form-item field="judgeConfig.timeLimit" label="时间限制">
           <a-input-number
             v-model="form.judgeConfig.timeLimit"
             placeholder="请输入时间限制"
             mode="button"
             size="large"
+            min="0"
           />
         </a-form-item>
 
-        <a-form-item
-          field="judgeConfig.memoryLimit"
-          label="内存限制"
-          style="min-width: 480px"
-        >
+        <a-form-item field="judgeConfig.memoryLimit" label="内存限制">
           <a-input-number
             v-model="form.judgeConfig.memoryLimit"
             placeholder="请输入内存限制"
             mode="button"
             size="large"
+            min="0"
           />
         </a-form-item>
 
-        <a-form-item
-          field="judgeConfig.stackLimit"
-          label="堆栈限制"
-          style="min-width: 480px"
-        >
+        <a-form-item field="judgeConfig.stackLimit" label="堆栈限制">
           <a-input-number
             v-model="form.judgeConfig.stackLimit"
             placeholder="请输入堆栈限制"
             mode="button"
             size="large"
+            min="0"
           />
         </a-form-item>
       </a-space>
