@@ -1,5 +1,10 @@
 <template>
-  <Editor :value="value" :plugins="plugins" @change="handleChange" />
+  <Editor
+    :value="value"
+    :mode="mode"
+    :plugins="plugins"
+    @change="handleChange"
+  />
 </template>
 
 <script setup lang="ts">
@@ -18,6 +23,7 @@ import mermaid from "@bytemd/plugin-mermaid";
 
 interface Props {
   value: string;
+  mode?: string;
   handleChange: (v: string) => void;
 }
 
@@ -37,16 +43,16 @@ const plugins = [
 
 const props = withDefaults(defineProps<Props>(), {
   value: () => "",
+  mode: () => "split",
   handleChange: (v: string) => {
     console.log(v);
   },
 });
-const value = ref("");
-
-const handleChange = (v: string) => {
-  value.value = v;
-};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style>
+.bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:last-child {
+  display: none;
+}
+</style>
