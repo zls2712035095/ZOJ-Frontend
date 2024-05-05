@@ -101,6 +101,8 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
+import { QuestionControllerService } from "../../../generated";
+import message from "@arco-design/web-vue/es/message";
 
 const form = reactive({
   answer: "暴力破解",
@@ -120,11 +122,14 @@ const form = reactive({
   title: "A + b",
 });
 
-const doSubmit = () => {
-  console.log(form.content);
+const doSubmit = async () => {
   console.log(form);
-  console.log(111);
-  console.log(form.answer);
+  const res = await QuestionControllerService.addQuestionUsingPost(form);
+  if (res.code === 0) {
+    message.success("创建成功");
+  } else {
+    message.error("创建失败" + res.message);
+  }
 };
 /**
  * 新增题目用例
@@ -145,12 +150,9 @@ const handleDelete = (index: number) => {
 
 const onContentChange = (value: string) => {
   form.content = value;
-  console.log(value);
-  console.log(1);
 };
 const onAnswerChange = (value: string) => {
   form.answer = value;
-  console.log("答案改变");
 };
 </script>
 
