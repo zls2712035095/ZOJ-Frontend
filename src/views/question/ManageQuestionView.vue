@@ -1,10 +1,20 @@
 <template>
   <div id="manageQuestionView">
-    <a-table :columns="columns" :data="dataList">
+    <a-table
+      :columns="columns"
+      :data="dataList"
+      :pagination="{
+        showTotal: true,
+        pageSize: searchParams.pageSize,
+        current: searchParams.pageNum,
+        total,
+      }"
+    >
       <template #optional="{ record }">
-        <a-button @click="$modal.info({ title: 'Name', content: record.name })"
-          >view
-        </a-button>
+        <a-space>
+          <a-button type="primary" @click="doUpdate(record)">修改</a-button>
+          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+        </a-space>
       </template>
     </a-table>
   </div>
@@ -12,8 +22,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { QuestionControllerService } from "../../../generated";
+import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
+import { useRouter } from "vue-router";
 
 const show = ref(true);
 
@@ -92,6 +103,27 @@ const columns = [
     slotName: "optional",
   },
 ];
+
+const doDelete = async (question: Question) => {
+  const res = await QuestionControllerService.deleteQuestionUsingPost({
+    id: question.id,
+  });
+  if (res.code === 0) {
+    message.success("删除成功");
+    // todo 更新数据
+  }
+};
+
+const router = useRouter();
+
+const doUpdate = (question: Question) => {
+  router.push({
+    path: "/update/question",
+    query: {
+      id: question.id,
+    },
+  });
+};
 </script>
 
 <style scoped></style>

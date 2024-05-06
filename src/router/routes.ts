@@ -42,6 +42,14 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/update/question",
+    name: "更新题目",
+    component: AddQuestionView,
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
     path: "/manage/question",
     name: "管理题目",
     component: ManageQuestionView,
