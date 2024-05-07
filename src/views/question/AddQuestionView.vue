@@ -113,7 +113,7 @@ const updatePage = route.path.includes("update");
 
 let form = ref({
   title: "",
-  tags: [""],
+  tags: [],
   judgeConfig: {
     memoryLimit: 1000,
     stackLimit: 1000,
