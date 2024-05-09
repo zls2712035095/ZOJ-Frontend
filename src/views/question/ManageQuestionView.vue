@@ -6,9 +6,10 @@
       :pagination="{
         showTotal: true,
         pageSize: searchParams.pageSize,
-        current: searchParams.pageNum,
+        current: searchParams.current,
         total,
       }"
+      @page-change="onPageChange"
     >
       <template #optional="{ record }">
         <a-space>
@@ -21,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
@@ -32,7 +33,7 @@ const dataList = ref([]);
 const total = ref(0);
 const searchParams = ref({
   pageSize: 10,
-  pageNum: 1,
+  current: 1,
 });
 
 const loadData = async () => {
@@ -46,6 +47,13 @@ const loadData = async () => {
     message.error("加载失败" + res.message);
   }
 };
+
+/**
+ * 监听 searchParams 变量改变， 触发页面的重新加载
+ */
+watchEffect(() => {
+  loadData();
+});
 
 /**
  * 页面加载时加载数据
@@ -103,6 +111,15 @@ const columns = [
     slotName: "optional",
   },
 ];
+
+const onPageChange = (page: number) => {
+  // todo 奇妙的bug 会出现分页切换后内容不更新这种情况,但是当在别的地方（监控的地方或者loadData里面）输出看一下current时，就正常显示了
+  //searchParams.value.current = page;
+  searchParams.value = {
+    ...searchParams.value,
+    current: page,
+  };
+};
 
 const doDelete = async (question: Question) => {
   const res = await QuestionControllerService.deleteQuestionUsingPost({
