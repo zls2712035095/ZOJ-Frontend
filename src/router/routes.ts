@@ -8,6 +8,7 @@ import UserLoginView from "@/views/user/UserLoginView.vue";
 import UserRegisterView from "@/views/user/UserRegisterView.vue";
 import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
+import QuestionsView from "@/views/question/QuestionsView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   // todo 嵌套路由改造 -》嵌套菜单
@@ -33,8 +34,13 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/",
-    name: "题目",
-    component: HomeView,
+    name: "主页",
+    component: QuestionsView,
+  },
+  {
+    path: "/questions",
+    name: "题库",
+    component: QuestionsView,
   },
   {
     path: "/add/question",
