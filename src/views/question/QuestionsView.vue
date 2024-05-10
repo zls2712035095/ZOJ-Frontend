@@ -1,5 +1,6 @@
 <template>
   <div id="questionsView">
+    <h1 align="center">ZOJ在线题库</h1>
     <a-form :model="searchParams" layout="inline">
       <a-form-item field="title" label="题目名称" style="min-width: 240px">
         <a-input v-model="searchParams.title" placeholder="请输入题目名称" />
@@ -155,4 +156,9 @@ const doSubmit = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#questionsView {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+</style>
