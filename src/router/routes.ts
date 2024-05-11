@@ -9,6 +9,7 @@ import UserRegisterView from "@/views/user/UserRegisterView.vue";
 import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
 import QuestionsView from "@/views/question/QuestionsView.vue";
+import DoQuestionsView from "@/views/question/DoQuestionsView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   // todo 嵌套路由改造 -》嵌套菜单
@@ -41,6 +42,16 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/questions",
     name: "题库",
     component: QuestionsView,
+  },
+  {
+    path: "/view/question/:id",
+    name: "做题页面",
+    component: DoQuestionsView,
+    props: true,
+    meta: {
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
+    },
   },
   {
     path: "/add/question",
