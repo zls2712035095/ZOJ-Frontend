@@ -57,6 +57,7 @@
         <CodeEditor
           :value="form.code as string"
           :language="form.language as string"
+          :handle-change="changeCode"
         />
         <a-divider size="0" />
         <a-button type="primary" style="min-width: 200px" @click="doSubmit"
@@ -109,16 +110,24 @@ onMounted(() => {
 });
 
 const form = ref<QuestionSubmitAddRequest>({
+  questionId: "" as any,
   language: "c++",
   code: "",
 });
+const changeCode = (value: string) => {
+  form.value.code = value;
+};
 /**
  * 提交代码
  */
 const doSubmit = async () => {
-  const res = await QuestionSubmitControllerService.doQuestionSubmitUsingPost(
-    form.value
-  );
+  if (!question.value?.id) {
+    return;
+  }
+  const res = await QuestionSubmitControllerService.doQuestionSubmitUsingPost({
+    ...form.value,
+    questionId: question.value.id,
+  });
   if (res.code === 0) {
     message.success("提交成功");
   } else {
