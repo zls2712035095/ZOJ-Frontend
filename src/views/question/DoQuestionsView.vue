@@ -10,13 +10,13 @@
                 :column="{ xs: 1, md: 2, lg: 3 }"
               >
                 <a-descriptions-item label="时间限制">
-                  <a-tag>{{ question.judgeConfig.timeLimit ?? 0 }}</a-tag>
+                  {{ question.judgeConfig.timeLimit ?? 0 }}
                 </a-descriptions-item>
                 <a-descriptions-item label="内存限制">
-                  <a-tag>{{ question.judgeConfig.memoryLimit ?? 0 }}</a-tag>
+                  {{ question.judgeConfig.memoryLimit ?? 0 }}
                 </a-descriptions-item>
                 <a-descriptions-item label="堆栈限制">
-                  <a-tag>{{ question.judgeConfig.stackLimit ?? 0 }}</a-tag>
+                  {{ question.judgeConfig.stackLimit ?? 0 }}
                 </a-descriptions-item>
               </a-descriptions>
               <MdViewer :value="question.content || ''" />
@@ -41,7 +41,7 @@
         </a-tabs>
       </a-col>
       <a-col :md="12" :xs="24">
-        <a-form :model="searchParams" layout="inline">
+        <a-form :model="form" layout="inline">
           <a-form-item field="title" label="题目语言" style="min-width: 240px">
             <a-select
               v-model="form.language"
@@ -111,7 +111,7 @@ onMounted(() => {
 
 const form = ref<QuestionSubmitAddRequest>({
   questionId: "" as any,
-  language: "c++",
+  language: "java",
   code: "",
 });
 const changeCode = (value: string) => {
