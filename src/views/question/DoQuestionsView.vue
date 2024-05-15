@@ -48,7 +48,7 @@
               :style="{ width: '320px' }"
               placeholder="编程语言"
             >
-              <a-option>c++</a-option>
+              <a-option>cpp</a-option>
               <a-option>java</a-option>
               <a-option>golang</a-option>
             </a-select>
