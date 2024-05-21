@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type JudgeInfo = {
-    memory?: number;
+import type { QuestionSubmit } from './QuestionSubmit';
+export type BaseResponse_QuestionSubmit_ = {
+    code?: number;
+    data?: QuestionSubmit;
     message?: string;
-    time?: number;
 };
 

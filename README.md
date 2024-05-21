@@ -39,8 +39,9 @@ https://github.com/microsoft/monaco-editor/blob/main/docs/integrate-esm.md
 ### 安装了moment 来处理时间
 ```
 npm install moment --save
-格式
-https://momentjs.cn/docs/#/displaying/
 ```
+>格式
+> 
+>https://momentjs.cn/docs/#/displaying/
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).

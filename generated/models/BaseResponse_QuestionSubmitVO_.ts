@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type JudgeInfo = {
-    memory?: number;
+import type { QuestionSubmitVO } from './QuestionSubmitVO';
+export type BaseResponse_QuestionSubmitVO_ = {
+    code?: number;
+    data?: QuestionSubmitVO;
     message?: string;
-    time?: number;
 };
 

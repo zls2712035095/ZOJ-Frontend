@@ -32,12 +32,6 @@
               </template>
             </a-card>
           </a-tab-pane>
-          <a-tab-pane key="comment" title="评论">
-            Content of Tab Panel 2
-          </a-tab-pane>
-          <a-tab-pane key="answer" title="题解">
-            {{ (question && question.answer) || "暂时无法查看该题解" }}
-          </a-tab-pane>
         </a-tabs>
       </a-col>
       <a-col :md="12" :xs="24">
@@ -48,9 +42,7 @@
               :style="{ width: '320px' }"
               placeholder="编程语言"
             >
-              <a-option>cpp</a-option>
               <a-option>java</a-option>
-              <a-option>golang</a-option>
             </a-select>
           </a-form-item>
         </a-form>
@@ -59,10 +51,8 @@
           :language="form.language as string"
           :handle-change="changeCode"
         />
+        {{ form.code }}
         <a-divider size="0" />
-        <a-button type="primary" style="min-width: 200px" @click="doSubmit"
-          >提交代码
-        </a-button>
       </a-col>
     </a-row>
   </div>
@@ -74,6 +64,7 @@ import {
   QuestionControllerService,
   QuestionSubmitAddRequest,
   QuestionVO,
+  QuestionSubmitVO,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import CodeEditor from "@/components/CodeEditor.vue";
@@ -88,14 +79,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const question = ref<QuestionVO>();
+const questionSubmit = ref<QuestionSubmitVO>();
 
 const loadData = async () => {
-  const res = await QuestionControllerService.getQuestionVoByIdUsingGet(
+  const res = await QuestionControllerService.getQuestionSubmitVoByIdUsingGet(
     props.id as any
   );
   if (res.code === 0) {
     console.log(res.data);
-    question.value = res.data;
+    question.value = res.data?.questionVO;
+    questionSubmit.value = res.data;
+    form.value.code = questionSubmit.value?.code;
+    console.log(form.value.code);
   } else {
     message.error("题目加载失败" + res.message);
   }
@@ -111,27 +106,10 @@ onMounted(() => {
 const form = ref<QuestionSubmitAddRequest>({
   questionId: "" as any,
   language: "java",
-  code: "",
+  code: questionSubmit.value?.code,
 });
 const changeCode = (value: string) => {
   form.value.code = value;
-};
-/**
- * 提交代码
- */
-const doSubmit = async () => {
-  if (!question.value?.id) {
-    return;
-  }
-  const res = await QuestionControllerService.doQuestionSubmitUsingPost({
-    ...form.value,
-    questionId: question.value.id,
-  });
-  if (res.code === 0) {
-    message.success("提交成功");
-  } else {
-    message.error("提交失败" + res.message);
-  }
 };
 </script>
 

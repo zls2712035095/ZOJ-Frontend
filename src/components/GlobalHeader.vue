@@ -23,7 +23,92 @@
     </a-col>
     <a-col flex="100px">
       <div>
-        {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+        <a-space direction="vertical" style="align-items: center">
+          <a-dropdown trigger="hover">
+            <template v-if="store.state.user?.loginUser">
+              <template v-if="store.state.user?.loginUser.userAvatar">
+                <a-avatar shape="circle"
+                  ><img
+                    alt="avatar"
+                    :src="store.state.user?.loginUser.userAvatar"
+                    class="userAvatar"
+                /></a-avatar>
+              </template>
+              <template v-else>
+                <a-avatar shape="circle">
+                  <IconUser />
+                </a-avatar>
+              </template>
+            </template>
+            <template v-else>
+              <a-avatar>未登录</a-avatar>
+            </template>
+            <template #content>
+              <template
+                v-if="
+                  store.state.user?.loginUser &&
+                  store.state.user?.loginUser.userRole !== ACCESS_ENUM.NOT_LOGIN
+                "
+              >
+                <a-doption>
+                  <template #icon>
+                    <icon-idcard />
+                  </template>
+                  <template #default>
+                    <a-anchor-link href="/user/infomessage"
+                      >个⼈信息</a-anchor-link
+                    >
+                  </template>
+                </a-doption>
+                <a-doption>
+                  <template #icon>
+                    <icon-idcard />
+                  </template>
+                  <template #default>
+                    <a-anchor-link href="/user/update"
+                      >修改个⼈信息
+                    </a-anchor-link>
+                  </template>
+                </a-doption>
+                <a-doption>
+                  <template #icon>
+                    <icon-poweroff />
+                  </template>
+                  <template #default>
+                    <a-anchor-link href="/user/updatepwd"
+                      >修改密码
+                    </a-anchor-link>
+                  </template>
+                </a-doption>
+                <a-doption>
+                  <template #icon>
+                    <icon-poweroff />
+                  </template>
+                  <template #default>
+                    <a-anchor-link @click="logout">退出登录</a-anchor-link>
+                  </template>
+                </a-doption>
+              </template>
+              <template v-else>
+                <a-doption>
+                  <template #icon>
+                    <icon-user />
+                  </template>
+                  <template #default>
+                    <a-anchor-link href="/user/login">⽤户登录</a-anchor-link>
+                  </template>
+                </a-doption>
+                <a-doption>
+                  <template #icon>
+                    <icon-user-add />
+                  </template>
+                  <a-anchor-link href="/user/register">⽤户注册</a-anchor-link>
+                </a-doption>
+              </template>
+            </template>
+          </a-dropdown>
+          {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+        </a-space>
       </div>
     </a-col>
   </a-row>
@@ -36,6 +121,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/ACCESS_ENUM";
+import { UserControllerService } from "../../generated";
 
 const router = useRouter();
 const store = useStore();
@@ -74,6 +160,10 @@ const doMenuClick = (key: string) => {
   router.push({
     path: key,
   });
+};
+const logout = () => {
+  UserControllerService.userLogoutUsingPost();
+  location.reload();
 };
 </script>
 
