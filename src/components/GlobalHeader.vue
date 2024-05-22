@@ -50,14 +50,30 @@
                   store.state.user?.loginUser.userRole !== ACCESS_ENUM.NOT_LOGIN
                 "
               >
+                <template
+                  v-if="
+                    store.state.user?.loginUser.userRole === ACCESS_ENUM.ADMIN
+                  "
+                >
+                  <a-doption>
+                    <template #icon>
+                      <icon-idcard />
+                    </template>
+                    <template #default>
+                      <a-anchor-link href="/user/adminmanager"
+                        >用户管理
+                      </a-anchor-link>
+                    </template>
+                  </a-doption>
+                </template>
                 <a-doption>
                   <template #icon>
                     <icon-idcard />
                   </template>
                   <template #default>
                     <a-anchor-link href="/user/infomessage"
-                      >个⼈信息</a-anchor-link
-                    >
+                      >个⼈信息
+                    </a-anchor-link>
                   </template>
                 </a-doption>
                 <a-doption>

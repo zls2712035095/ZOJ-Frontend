@@ -17,6 +17,7 @@ import { toRaw, onMounted, ref, withDefaults, defineProps, watch } from "vue";
 interface Props {
   value: string;
   language: string;
+  codeDefault: string;
   handleChange: (v: string) => void;
 }
 
@@ -27,7 +28,8 @@ const codeEditor = ref();
  */
 const props = withDefaults(defineProps<Props>(), {
   value: () => "",
-  language: () => "c++",
+  language: () => "java",
+  codeDefault: () => "",
   handleChange: (v: string) => {
     console.log(v);
   },
@@ -47,6 +49,14 @@ watch(
         toRaw(codeEditor.value).getModel(),
         props.language
       );
+    }
+  }
+);
+watch(
+  () => props.codeDefault,
+  () => {
+    if (codeEditor.value) {
+      toRaw(codeEditor.value).setValue(props.codeDefault);
     }
   }
 );

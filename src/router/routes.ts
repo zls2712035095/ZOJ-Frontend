@@ -15,6 +15,9 @@ import QuestionSubmitCodeView from "@/views/question/QuestionSubmitCodeView.vue"
 import UserUpdateView from "@/views/user/UserUpdateView.vue";
 import UserUpdatePwdView from "@/views/user/UserUpdatePwdView.vue";
 import UserInfoMessageView from "@/views/user/UserInfoMessageView.vue";
+import ManageUserView from "@/views/user/ManageUserView.vue";
+import ExampleView from "@/views/ExampleView.vue";
+import UserUpdateByAdminView from "@/views/user/UserUpdateByAdminView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   // todo 嵌套路由改造 -》嵌套菜单
@@ -47,6 +50,20 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/user/updatepwd",
         name: "用户修改密码",
         component: UserUpdatePwdView,
+      },
+      {
+        path: "/user/adminmanager",
+        name: "管理员页面",
+        component: ManageUserView,
+      },
+      {
+        path: "/user/update/:id",
+        name: "管理员修改用户信息页面",
+        component: UserUpdateByAdminView,
+        props: true,
+        meta: {
+          access: ACCESS_ENUM.USER,
+        },
       },
     ],
     meta: {
@@ -128,7 +145,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/noAuth",
     name: "无权限",
-    component: NoAuthView,
+    component: ExampleView,
     meta: {
       hideInMenu: true,
     },

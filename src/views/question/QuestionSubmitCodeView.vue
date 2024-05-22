@@ -49,9 +49,9 @@
         <CodeEditor
           :value="form.code as string"
           :language="form.language as string"
+          :code-default="questionSubmit.code as string"
           :handle-change="changeCode"
         />
-        {{ form.code }}
         <a-divider size="0" />
       </a-col>
     </a-row>
@@ -59,7 +59,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, withDefaults, defineProps } from "vue";
+import {
+  onMounted,
+  ref,
+  withDefaults,
+  defineProps,
+  reactive,
+  watch,
+} from "vue";
 import {
   QuestionControllerService,
   QuestionSubmitAddRequest,
@@ -79,8 +86,21 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const question = ref<QuestionVO>();
-const questionSubmit = ref<QuestionSubmitVO>();
-
+const questionSubmit = reactive<QuestionSubmitVO>({
+  judgeInfo: {},
+  code: "",
+});
+const form = reactive({
+  questionId: "" as any,
+  language: "java",
+  code: questionSubmit.code,
+});
+watch(
+  () => questionSubmit.code,
+  () => {
+    form.code = questionSubmit.code as string;
+  }
+);
 const loadData = async () => {
   const res = await QuestionControllerService.getQuestionSubmitVoByIdUsingGet(
     props.id as any
@@ -88,9 +108,16 @@ const loadData = async () => {
   if (res.code === 0) {
     console.log(res.data);
     question.value = res.data?.questionVO;
-    questionSubmit.value = res.data;
-    form.value.code = questionSubmit.value?.code;
-    console.log(form.value.code);
+    questionSubmit.code = res.data?.code;
+    questionSubmit.code = res.data?.code;
+    if (res.data?.code) {
+      form.code = res.data.code;
+    }
+    if (res.data?.language) {
+      form.language = res.data.language;
+    }
+    form.code = questionSubmit.code as string;
+    console.log(form.code);
   } else {
     message.error("题目加载失败" + res.message);
   }
@@ -103,13 +130,8 @@ onMounted(() => {
   loadData();
 });
 
-const form = ref<QuestionSubmitAddRequest>({
-  questionId: "" as any,
-  language: "java",
-  code: questionSubmit.value?.code,
-});
 const changeCode = (value: string) => {
-  form.value.code = value;
+  form.code = value;
 };
 </script>
 

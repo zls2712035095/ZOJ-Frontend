@@ -1,5 +1,9 @@
 <template>
   <div id="manageUserView">
+    <a-space>
+      <a-button type="primary" href="/">返回</a-button>
+      <a-button type="primary" href="/user/add">新增</a-button>
+    </a-space>
     <a-table
       :columns="columns"
       :data="dataList"
@@ -14,6 +18,9 @@
       <template #optional="{ record }">
         <a-space>
           <a-button type="primary" @click="doUpdate(record)">修改</a-button>
+          <a-button type="primary" @click="doRestartPwd(record)"
+            >重置密码
+          </a-button>
           <a-button status="danger" @click="doDelete(record)">删除</a-button>
         </a-space>
       </template>
@@ -22,12 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
-import {
-  UserControllerService,
-  Question,
-  QuestionControllerService,
-} from "../../../generated";
+import { onMounted, reactive, ref, watchEffect } from "vue";
+import { UserControllerService, User } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 
@@ -47,6 +50,7 @@ const loadData = async () => {
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
+    console.log(dataList);
   } else {
     message.error("加载失败" + res.message);
   }
@@ -71,44 +75,16 @@ const columns = [
     dataIndex: "id",
   },
   {
-    title: "标题",
-    dataIndex: "title",
+    title: "昵称",
+    dataIndex: "userName",
   },
   {
-    title: "内容",
-    dataIndex: "content",
+    title: "用户简介",
+    dataIndex: "userProfile",
   },
   {
-    title: "标签",
-    dataIndex: "tags",
-  },
-  {
-    title: "答案",
-    dataIndex: "answer",
-  },
-  {
-    title: "提交总数",
-    dataIndex: "submitNum",
-  },
-  {
-    title: "通过总数",
-    dataIndex: "acceptNum",
-  },
-  {
-    title: "题目限制",
-    dataIndex: "judgeConfig",
-  },
-  {
-    title: "题目用例",
-    dataIndex: "judgeCase",
-  },
-  {
-    title: "用户id",
-    dataIndex: "userid",
-  },
-  {
-    title: "创建时间",
-    dataIndex: "createTime",
+    title: "用户权限",
+    dataIndex: "userRole",
   },
   {
     title: "操作",
@@ -125,9 +101,9 @@ const onPageChange = (page: number) => {
   };
 };
 
-const doDelete = async (question: Question) => {
+const doDelete = async (user: User) => {
   const res = await UserControllerService.deleteUserUsingPost({
-    id: question.id,
+    id: user.id,
   });
   if (res.code === 0) {
     message.success("删除成功");
@@ -139,13 +115,28 @@ const doDelete = async (question: Question) => {
 
 const router = useRouter();
 
-const doUpdate = (question: Question) => {
+const doUpdate = (user: User) => {
   router.push({
-    path: "/update/question",
-    query: {
-      id: question.id,
-    },
+    path: `/user/update/${user.id}`,
   });
+};
+const form = reactive({
+  id: 0 as number,
+  userName: "",
+  userAvatar: "",
+  userProfile: "",
+  userPassword: "12345678",
+});
+const doRestartPwd = async (user: User) => {
+  form.id = user.id as number;
+  form.userPassword = "12345678";
+  const res = await UserControllerService.updateUserUsingPost(form);
+  if (res.code === 0) {
+    message.success("密码重置成功");
+    loadData();
+  } else {
+    message.error("更新失败" + res.message);
+  }
 };
 </script>
 
