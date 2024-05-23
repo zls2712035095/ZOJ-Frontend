@@ -1,10 +1,41 @@
 <template>
-  <div id="manageUserView">
-    <a-space>
-      <a-button type="primary" href="/">返回</a-button>
-      <a-button type="primary" href="/user/add">新增</a-button>
-    </a-space>
+  <div id="userManageView">
+    <a-form
+      :model="searchParams"
+      layout="inline"
+      style="justify-content: center; align-content: center; margin: 25px"
+    >
+      <a-form-item field="title" label="用户编号：" tooltip="请输入用户的编号">
+        <a-input
+          v-model="searchParams.id"
+          placeholder="请输入要搜索的用户编号"
+        />
+      </a-form-item>
+      <a-form-item field="title" label="用户名称：" tooltip="请输入用户名称">
+        <a-input
+          v-model="searchParams.userName"
+          placeholder="请输入要搜索的用户名称"
+        />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="outline" shape="round" status="normal" @click="doSubmit"
+          >搜 索
+        </a-button>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="outline" shape="round" status="normal" @click="loadData"
+          >刷 新
+        </a-button>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="outline" shape="round" status="normal" href="/"
+          >返回
+        </a-button>
+      </a-form-item>
+    </a-form>
     <a-table
+      :column-resizable="true"
+      :ref="tableRef"
       :columns="columns"
       :data="dataList"
       :pagination="{
@@ -12,95 +43,279 @@
         pageSize: searchParams.pageSize,
         current: searchParams.current,
         total,
+        showJumper: true,
+        showPageSize: true,
       }"
       @page-change="onPageChange"
+      @pageSizeChange="onPageSizeChange"
     >
+      <template #userAvatar="{ record }">
+        <a-avatar :size="70" shape="circle">
+          <template v-if="record.userAvatar">
+            <img alt="头像" :src="record.userAvatar" />
+          </template>
+          <template v-else>
+            <IconUser />
+          </template>
+        </a-avatar>
+      </template>
+      <template #userRole="{ record }">
+        <!-- user普通用户 admin管理员 -->
+        <a-tag v-if="record.userRole === 'user'" color="arcoblue"
+          >普通用户
+        </a-tag>
+        <a-tag v-if="record.userRole === 'admin'" color="green">管理员</a-tag>
+      </template>
+      <template #createTime="{ record }">
+        {{ moment(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
+      </template>
+      <template #updateTime="{ record }">
+        {{ moment(record.updateTime).format("YYYY-MM-DD HH:mm:ss") }}
+      </template>
+      <template #userState="{ record }">
+        <a-tag v-if="record.userState === '正常'" color="blue">正常</a-tag>
+        <a-tag v-if="record.userState === '注销'" color="grey">注销</a-tag>
+        <a-tag v-if="record.userState === '封号'" color="red">封号</a-tag>
+      </template>
       <template #optional="{ record }">
         <a-space>
-          <a-button type="primary" @click="doUpdate(record)">修改</a-button>
-          <a-button type="primary" @click="doRestartPwd(record)"
-            >重置密码
+          <a-button
+            shape="round"
+            type="outline"
+            @click="openModalForm(record.id)"
+            >修改
           </a-button>
-          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+          <a-popconfirm
+            content="确定要删除此用户吗?"
+            type="error"
+            okText="是"
+            cancelText="否"
+            @cancel="
+              () => {
+                console.log(`已取消`);
+              }
+            "
+            @ok="doDelete(record)"
+          >
+            <a-button shape="round" type="outline" status="danger"
+              >删除
+            </a-button>
+          </a-popconfirm>
+          <a-popconfirm
+            content="确定要重置此用户密码吗?"
+            type="error"
+            okText="是"
+            cancelText="否"
+            @cancel="
+              () => {
+                console.log(`已取消`);
+              }
+            "
+            @ok="doRestartPwd(record)"
+          >
+            <a-button shape="round" type="outline" status="danger"
+              >重置密码
+            </a-button>
+          </a-popconfirm>
         </a-space>
       </template>
     </a-table>
+    <a-modal
+      width="30%"
+      :visible="visible"
+      placement="right"
+      @ok="handleOk"
+      @cancel="closeModel"
+      unmountOnClose
+    >
+      <div style="text-align: center">
+        <a-upload
+          action="/"
+          :fileList="file ? [file] : []"
+          :show-file-list="false"
+          @change="onChange"
+          :custom-request="uploadAvatar"
+        >
+          <template #upload-button>
+            <a-avatar :size="70" shape="circle">
+              <template v-if="userInfo?.userAvatar">
+                <img alt="头像" :src="userInfo?.userAvatar" />
+              </template>
+              <template v-else>
+                <IconUser />
+              </template>
+            </a-avatar>
+          </template>
+        </a-upload>
+      </div>
+      <a-form
+        label-align="right"
+        title="个人信息"
+        style="max-width: 480px; margin: 0 auto"
+      >
+        <a-form-item field="名称" label="名称 :">
+          <a-input v-model="userInfo.userName" placeholder="请输入用户名称" />
+        </a-form-item>
+        <a-form-item field="账号" label="账号 :">
+          <a-input v-model="userInfo.userAccount" placeholder="请输入账号" />
+        </a-form-item>
+        <a-form-item field="用户状态" label="状态 :">
+          <a-select v-model="userInfo.userState" placeholder="请输入用户状态">
+            <a-option value="正常">正常</a-option>
+            <a-option value="注销">注销</a-option>
+            <a-option value="封号">封号</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item field="用户角色" label="角色 :">
+          <a-select v-model="userInfo.userRole" placeholder="请输入用户角色">
+            <a-option value="admin">管理员</a-option>
+            <a-option value="user">普通用户</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item field="userProfile" label="简介 :">
+          <a-textarea v-model="userInfo.userProfile" placeholder="请输入简介" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watchEffect } from "vue";
-import { UserControllerService, User } from "../../../generated";
-import message from "@arco-design/web-vue/es/message";
-import { useRouter } from "vue-router";
+import { onMounted, ref, watchEffect } from "vue";
+import { User, UserControllerService } from "../../../generated";
 
-const show = ref(true);
+import message from "@arco-design/web-vue/es/message";
+import moment from "moment";
+import { useRouter } from "vue-router";
+import { FileItem, Message } from "@arco-design/web-vue";
+
+const router = useRouter();
+const tableRef = ref();
+const file = ref();
+
+const visible = ref(false);
+const userInfo = ref<User>();
 
 const dataList = ref([]);
 const total = ref(0);
 const searchParams = ref({
+  id: undefined,
+  userName: "",
   pageSize: 10,
   current: 1,
 });
 
 const loadData = async () => {
-  const res = await UserControllerService.listUserByPageUsingPost(
-    searchParams.value
-  );
+  const res = await UserControllerService.listUserByPageUsingPost({
+    ...searchParams.value,
+    sortField: "createTime",
+    sortOrder: "descend",
+  });
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
-    console.log(dataList);
   } else {
-    message.error("加载失败" + res.message);
+    message.error("加载失败，" + res.message);
   }
 };
 
 /**
- * 监听 searchParams 变量改变， 触发页面的重新加载
+ * 监听 searchParams 变量，改变时触发页面的重新加载
  */
 watchEffect(() => {
   loadData();
 });
 
 /**
- * 页面加载时加载数据
+ * 页面加载时，请求数据
  */
 onMounted(() => {
   loadData();
 });
+
 const columns = [
   {
-    title: "id",
+    title: "编号",
     dataIndex: "id",
+    align: "center",
   },
   {
-    title: "昵称",
+    title: "账号",
+    dataIndex: "userAccount",
+    align: "center",
+  },
+  {
+    title: "名称",
     dataIndex: "userName",
+    align: "center",
   },
   {
-    title: "用户简介",
+    title: "头像",
+    slotName: "userAvatar",
+    align: "center",
+    width: 64,
+  },
+  {
+    title: "简介",
     dataIndex: "userProfile",
+    align: "center",
   },
   {
-    title: "用户权限",
-    dataIndex: "userRole",
+    title: "角色",
+    slotName: "userRole",
+    align: "center",
+  },
+  {
+    title: "创建时间",
+    slotName: "createTime",
+    align: "center",
+  },
+  {
+    title: "更新时间",
+    slotName: "updateTime",
+    align: "center",
   },
   {
     title: "操作",
     slotName: "optional",
+    align: "center",
   },
 ];
-
+/**
+ * 分页
+ * @param page
+ */
 const onPageChange = (page: number) => {
-  // todo 奇妙的bug 会出现分页切换后内容不更新这种情况,但是当在别的地方（监控的地方或者loadData里面）输出看一下current时，就正常显示了
-  //searchParams.value.current = page;
   searchParams.value = {
     ...searchParams.value,
     current: page,
   };
 };
 
+/**
+ * 分页大小
+ * @param size
+ */
+const onPageSizeChange = (size: number) => {
+  searchParams.value = {
+    ...searchParams.value,
+    pageSize: size,
+  };
+};
+/**
+ * 打开弹窗,获取到用户信息
+ */
+const openModalForm = async (userId: any) => {
+  const res = await UserControllerService.getUserByIdUsingGet(userId);
+  console.log("res:", res.data);
+  userInfo.value = res.data;
+  console.log(userInfo.value);
+  visible.value = true;
+};
+/**
+ * 删除
+ * @param user
+ */
 const doDelete = async (user: User) => {
   const res = await UserControllerService.deleteUserUsingPost({
     id: user.id,
@@ -113,24 +328,64 @@ const doDelete = async (user: User) => {
   }
 };
 
-const router = useRouter();
-
-const doUpdate = (user: User) => {
-  router.push({
-    path: `/user/update/${user.id}`,
-  });
+/**
+ * 确认搜索，重新加载数据
+ */
+const doSubmit = () => {
+  // 这里需要重置搜索页号
+  searchParams.value = {
+    ...searchParams.value,
+    current: 1,
+  };
 };
-const form = reactive({
-  id: 0 as number,
-  userName: "",
-  userAvatar: "",
-  userProfile: "",
-  userPassword: "12345678",
-});
+
+// 从表单中获取的用户头像
+let userAvatarImg = userInfo.value?.userAvatar;
+
+// /**
+//  * 上传头像
+//  */
+// const uploadAvatar = async () => {
+//   const res = await FileControllerService.uploadFileUsingPost(file?.value.file);
+//   if (res.code === 0) {
+//     userAvatarImg = res.data;
+//     Message.success("上传成功，点击确认即可修改头像");
+//   } else {
+//     Message.error("上传失败！" + res.data);
+//   }
+// };
+
+/**
+ * 确定修改按钮
+ */
+const handleOk = async () => {
+  const res = await UserControllerService.updateUserUsingPost({
+    ...userInfo.value,
+    userAvatar: userAvatarImg,
+  });
+  if (res.code === 0) {
+    Message.success("更新成功！");
+    visible.value = false;
+    location.reload();
+  } else {
+    Message.error("更新失败！", res.msg);
+  }
+};
+const closeModel = () => {
+  visible.value = false;
+};
+
+const onChange = async (_: never, currentFile: FileItem) => {
+  file.value = {
+    ...currentFile,
+  };
+};
 const doRestartPwd = async (user: User) => {
-  form.id = user.id as number;
-  form.userPassword = "12345678";
-  const res = await UserControllerService.updateUserUsingPost(form);
+  const res = await UserControllerService.updateUserUsingPost({
+    ...userInfo.value,
+    id: user.id,
+    userPassword: "12345678",
+  });
   if (res.code === 0) {
     message.success("密码重置成功");
     loadData();
@@ -140,4 +395,10 @@ const doRestartPwd = async (user: User) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#userManageView {
+  padding: 5px;
+  box-shadow: 0px 0px 10px rgba(35, 7, 7, 0.21);
+  border-radius: 10px;
+}
+</style>

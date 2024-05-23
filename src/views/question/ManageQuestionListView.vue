@@ -1,16 +1,5 @@
 <template>
-  <div id="manageQuestionView">
-    <a-form :model="searchParams" layout="inline">
-      <a-form-item field="title" label="题目名称" style="min-width: 240px">
-        <a-input v-model="searchParams.title" placeholder="请输入题目名称" />
-      </a-form-item>
-      <a-form-item field="tags" label="标签" style="min-width: 240px">
-        <a-input-tag v-model="searchParams.tags" placeholder="请输入标签" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="doSubmit">搜索</a-button>
-      </a-form-item>
-    </a-form>
+  <div id="manageQuestionListView">
     <a-table
       :columns="columns"
       :data="dataList"
@@ -27,6 +16,16 @@
           <a-tag v-for="(tag, index) of record.tags" :key="index" color="blue"
             >{{ tag }}
           </a-tag>
+        </a-space>
+      </template>
+      <template #questionCase="{ record }">
+        <a-space>
+          {{ record.questionCase.length }}
+        </a-space>
+      </template>
+      <template #userName="{ record }">
+        <a-space>
+          {{ record.userVO.userName }}
         </a-space>
       </template>
       <template #createTime="{ record }">
@@ -47,30 +46,29 @@ import { onMounted, ref, watchEffect } from "vue";
 import {
   Question,
   QuestionControllerService,
-  QuestionQueryRequest,
+  QuestionListControllerService,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
 import ACCESS_ENUM from "@/access/ACCESS_ENUM";
-import moment from "moment/moment";
+import { useStore } from "vuex";
+import moment from "moment";
 
-const show = ref(true);
+const store = useStore();
 
 const dataList = ref([]);
 const total = ref(0);
-const searchParams = ref<QuestionQueryRequest>({
-  title: "",
-  tags: [],
+const searchParams = ref({
   pageSize: 10,
   current: 1,
 });
-const store = useStore();
+
 const loadData = async () => {
   if (store.state.user?.loginUser.userRole === ACCESS_ENUM.USER) {
-    const res = await QuestionControllerService.listMyQuestionVoByPageUsingPost(
-      searchParams.value
-    );
+    const res =
+      await QuestionListControllerService.listMyQuestionListVoByPageUsingPost(
+        searchParams.value
+      );
     if (res.code === 0) {
       dataList.value = res.data.records;
       total.value = res.data.total;
@@ -78,9 +76,10 @@ const loadData = async () => {
       message.error("加载失败" + res.message);
     }
   } else {
-    const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
-      searchParams.value
-    );
+    const res =
+      await QuestionListControllerService.listQuestionListVoByPageUsingPost(
+        searchParams.value
+      );
     if (res.code === 0) {
       dataList.value = res.data.records;
       total.value = res.data.total;
@@ -113,24 +112,24 @@ const columns = [
     dataIndex: "title",
   },
   {
+    title: "内容",
+    dataIndex: "content",
+  },
+  {
     title: "标签",
     slotName: "tags",
   },
   {
-    title: "答案",
-    dataIndex: "answer",
-  },
-  {
-    title: "提交总数",
-    dataIndex: "submitNum",
-  },
-  {
-    title: "通过总数",
-    dataIndex: "acceptNum",
+    title: "题目用例个数",
+    slotName: "questionCase",
   },
   {
     title: "用户id",
     dataIndex: "userId",
+  },
+  {
+    title: "用户昵称",
+    slotName: "userName",
   },
   {
     title: "创建时间",
@@ -152,7 +151,7 @@ const onPageChange = (page: number) => {
 };
 
 const doDelete = async (question: Question) => {
-  const res = await QuestionControllerService.deleteQuestionUsingPost({
+  const res = await QuestionListControllerService.deleteQuestionListUsingPost({
     id: question.id,
   });
   if (res.code === 0) {
@@ -167,26 +166,16 @@ const router = useRouter();
 
 const doUpdate = (question: Question) => {
   router.push({
-    path: "/update/question",
+    path: "/update/questionList",
     query: {
       id: question.id,
     },
   });
 };
-/**
- * 搜索题目,重新加载数据
- */
-const doSubmit = () => {
-  //重置搜索页号
-  searchParams.value = {
-    ...searchParams.value,
-    current: 1,
-  };
-};
 </script>
 
 <style scoped>
-#manageQuestionView {
+#manageQuestionListView {
   max-width: 1500px;
   margin: 0 auto;
 }

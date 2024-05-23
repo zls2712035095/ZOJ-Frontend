@@ -1,17 +1,6 @@
 <template>
-  <div id="questionsView">
-    <h1 align="center">ZOJ在线题库</h1>
-    <a-form :model="searchParams" layout="inline">
-      <a-form-item field="title" label="题目名称" style="min-width: 240px">
-        <a-input v-model="searchParams.title" placeholder="请输入题目名称" />
-      </a-form-item>
-      <a-form-item field="tags" label="标签" style="min-width: 240px">
-        <a-input-tag v-model="searchParams.tags" placeholder="请输入标签" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" @click="doSubmit">搜索</a-button>
-      </a-form-item>
-    </a-form>
+  <div id="rankView">
+    <h1 align="center">排行榜</h1>
     <a-table
       :columns="columns"
       :data="dataList"
@@ -23,29 +12,12 @@
       }"
       @page-change="onPageChange"
     >
-      <template #tags="{ record }">
-        <a-space wrap>
-          <a-tag v-for="(tag, index) of record.tags" :key="index" color="blue"
-            >{{ tag }}
-          </a-tag>
-        </a-space>
-      </template>
       <template #acRate="{ record }">
         {{
-          `${record.submitNum ? record.acceptNum / record.submitNum : "0"}% (${
-            record.acceptNum
+          `${record.submitNum ? record.acNum / record.submitNum : "0"}% (${
+            record.acNum
           }/${record.submitNum})`
         }}
-      </template>
-      <template #createTime="{ record }">
-        {{ moment(record.createTime).format("YYYY-MM-DD") }}
-      </template>
-      <template #optional="{ record }">
-        <a-space>
-          <a-button type="primary" @click="toQuestionPage(record)"
-            >做题
-          </a-button>
-        </a-space>
       </template>
     </a-table>
   </div>
@@ -56,25 +28,27 @@ import { onMounted, ref, watchEffect } from "vue";
 import {
   Question,
   QuestionControllerService,
-  QuestionQueryRequest,
+  UserRankQueryRequest,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import moment from "moment";
 
+const show = ref(true);
+
 const dataList = ref([]);
 const total = ref(0);
-const searchParams = ref<QuestionQueryRequest>({
-  title: "",
-  tags: [],
+const searchParams = ref<UserRankQueryRequest>({
   pageSize: 10,
   current: 1,
 });
 
 const loadData = async () => {
-  const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
-    searchParams.value
-  );
+  const res = await QuestionControllerService.listUserRankByPageUsingPost({
+    ...searchParams.value,
+    sortField: "submitNum",
+    sortOrder: "descend",
+  });
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;
@@ -98,27 +72,28 @@ onMounted(() => {
 });
 const columns = [
   {
-    title: "题号",
+    title: "#",
     dataIndex: "id",
   },
   {
-    title: "标题",
-    dataIndex: "title",
+    title: "昵称",
+    dataIndex: "userName",
   },
   {
-    title: "标签",
-    slotName: "tags",
+    title: "简介",
+    dataIndex: "userProfile",
+  },
+  {
+    title: "过题数",
+    dataIndex: "acNum",
+  },
+  {
+    title: "提交数",
+    dataIndex: "submitNum",
   },
   {
     title: "通过率",
     slotName: "acRate",
-  },
-  {
-    title: "创建时间",
-    slotName: "createTime",
-  },
-  {
-    slotName: "optional",
   },
 ];
 
@@ -155,7 +130,7 @@ const doSubmit = () => {
 </script>
 
 <style scoped>
-#questionsView {
+#rankView {
   max-width: 1280px;
   margin: 0 auto;
 }

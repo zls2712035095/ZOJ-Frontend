@@ -2,10 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UserUpdateMyRequest = {
+export type UserRank = {
+    acNum?: number;
+    createTime?: string;
+    id?: number;
+    isDelete?: number;
+    submitNum?: number;
+    updateTime?: string;
     userAvatar?: string;
+    userId?: number;
     userName?: string;
-    userPassword?: string;
     userProfile?: string;
 };
 

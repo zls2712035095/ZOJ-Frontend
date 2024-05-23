@@ -2,17 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { JudgeConfig } from './JudgeConfig';
+import type { Question } from './Question';
 import type { UserVO } from './UserVO';
-export type QuestionVO = {
-    acceptNum?: number;
-    answer?: string;
+export type QuestionListVO = {
+    activeTime?: string;
     content?: string;
     createTime?: string;
     favourNum?: number;
     id?: number;
-    judgeConfig?: JudgeConfig;
-    submitNum?: number;
+    isDelete?: number;
+    questionCase?: Array<Question>;
     tags?: Array<string>;
     thumbNum?: number;
     title?: string;

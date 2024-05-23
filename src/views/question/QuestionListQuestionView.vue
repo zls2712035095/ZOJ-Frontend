@@ -1,5 +1,6 @@
 <template>
-  <div id="manageQuestionView">
+  <div id="questionListsView">
+    <h1 align="center">ZOJ在线题库</h1>
     <a-form :model="searchParams" layout="inline">
       <a-form-item field="title" label="题目名称" style="min-width: 240px">
         <a-input v-model="searchParams.title" placeholder="请输入题目名称" />
@@ -24,18 +25,29 @@
     >
       <template #tags="{ record }">
         <a-space wrap>
-          <a-tag v-for="(tag, index) of record.tags" :key="index" color="blue"
+          <a-tag
+            v-for="(tag, index) of JSON.parse(record.tags as any)"
+            :key="index"
+            color="blue"
             >{{ tag }}
           </a-tag>
         </a-space>
+      </template>
+      <template #acRate="{ record }">
+        {{
+          `${record.submitNum ? record.acceptNum / record.submitNum : "0"}% (${
+            record.acceptNum
+          }/${record.submitNum})`
+        }}
       </template>
       <template #createTime="{ record }">
         {{ moment(record.createTime).format("YYYY-MM-DD") }}
       </template>
       <template #optional="{ record }">
         <a-space>
-          <a-button type="primary" @click="doUpdate(record)">修改</a-button>
-          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+          <a-button type="primary" @click="toQuestionPage(record)"
+            >做题
+          </a-button>
         </a-space>
       </template>
     </a-table>
@@ -43,50 +55,42 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
+import { defineProps, onMounted, ref, watchEffect, withDefaults } from "vue";
 import {
   Question,
-  QuestionControllerService,
-  QuestionQueryRequest,
+  QuestionListQueryRequest,
+  QuestionListControllerService,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
-import ACCESS_ENUM from "@/access/ACCESS_ENUM";
-import moment from "moment/moment";
+import moment from "moment";
 
-const show = ref(true);
+interface Props {
+  id: string;
+}
 
-const dataList = ref([]);
+const props = withDefaults(defineProps<Props>(), {
+  id: () => "",
+});
+
+const dataList = ref([] as Question[]);
 const total = ref(0);
-const searchParams = ref<QuestionQueryRequest>({
+const searchParams = ref<QuestionListQueryRequest>({
   title: "",
   tags: [],
   pageSize: 10,
   current: 1,
 });
-const store = useStore();
+
 const loadData = async () => {
-  if (store.state.user?.loginUser.userRole === ACCESS_ENUM.USER) {
-    const res = await QuestionControllerService.listMyQuestionVoByPageUsingPost(
-      searchParams.value
-    );
-    if (res.code === 0) {
-      dataList.value = res.data.records;
-      total.value = res.data.total;
-    } else {
-      message.error("加载失败" + res.message);
-    }
+  const res = await QuestionListControllerService.getQuestionListVoByIdUsingGet(
+    props.id as any
+  );
+  if (res.code === 0) {
+    dataList.value = res.data?.questionCase as Array<Question>;
+    total.value = res.data?.questionCase?.length as any;
   } else {
-    const res = await QuestionControllerService.listQuestionVoByPageUsingPost(
-      searchParams.value
-    );
-    if (res.code === 0) {
-      dataList.value = res.data.records;
-      total.value = res.data.total;
-    } else {
-      message.error("加载失败" + res.message);
-    }
+    message.error("加载失败" + res.message);
   }
 };
 
@@ -105,7 +109,7 @@ onMounted(() => {
 });
 const columns = [
   {
-    title: "id",
+    title: "题号",
     dataIndex: "id",
   },
   {
@@ -117,27 +121,10 @@ const columns = [
     slotName: "tags",
   },
   {
-    title: "答案",
-    dataIndex: "answer",
-  },
-  {
-    title: "提交总数",
-    dataIndex: "submitNum",
-  },
-  {
-    title: "通过总数",
-    dataIndex: "acceptNum",
-  },
-  {
-    title: "用户id",
-    dataIndex: "userId",
-  },
-  {
     title: "创建时间",
     slotName: "createTime",
   },
   {
-    title: "操作",
     slotName: "optional",
   },
 ];
@@ -151,28 +138,17 @@ const onPageChange = (page: number) => {
   };
 };
 
-const doDelete = async (question: Question) => {
-  const res = await QuestionControllerService.deleteQuestionUsingPost({
-    id: question.id,
-  });
-  if (res.code === 0) {
-    message.success("删除成功");
-    loadData();
-  } else {
-    message.error("删除失败");
-  }
-};
-
 const router = useRouter();
-
-const doUpdate = (question: Question) => {
+/**
+ * 跳转到做题页面
+ * @param question
+ */
+const toQuestionPage = (question: Question) => {
   router.push({
-    path: "/update/question",
-    query: {
-      id: question.id,
-    },
+    path: `/view/questionList/do/${question.id}`,
   });
 };
+
 /**
  * 搜索题目,重新加载数据
  */
@@ -186,8 +162,8 @@ const doSubmit = () => {
 </script>
 
 <style scoped>
-#manageQuestionView {
-  max-width: 1500px;
+#questionsView {
+  max-width: 1280px;
   margin: 0 auto;
 }
 </style>

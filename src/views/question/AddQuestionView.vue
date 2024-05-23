@@ -1,6 +1,11 @@
 <template>
   <div id="addQuestionView">
-    <h2 align="center">创建题目</h2>
+    <template v-if="updatePage">
+      <h2 align="center">修改题目</h2>
+    </template>
+    <template v-else>
+      <h2 align="center">创建题目</h2>
+    </template>
     <a-form :model="form" :layout="layout">
       <a-form-item field="title" label="题目标题">
         <a-input v-model="form.title" placeholder="题目标题" />
@@ -91,7 +96,7 @@
       <div style="margin-top: 20px" />
       <a-form-item>
         <a-button type="primary" style="min-width: 200px" @click="doSubmit"
-          >Submit
+          >提交
         </a-button>
       </a-form-item>
     </a-form>
@@ -182,7 +187,7 @@ const doSubmit = async () => {
   console.log(form.value);
   //判断当前页面时创建还是更新
   if (updatePage) {
-    const res = await QuestionControllerService.updateQuestionUsingPost(
+    const res = await QuestionControllerService.editQuestionUsingPost(
       form.value
     );
     if (res.code === 0) {

@@ -19,6 +19,25 @@
       <a-form-item field="userProfile" label="用户简介">
         <a-input v-model="form.userProfile" placeholder="" />
       </a-form-item>
+      <a-form
+        style="max-width: 480px; margin: 0 auto"
+        label-align="left"
+        auto-label-width="true"
+        :model="questionform"
+      >
+        <a-form-item field="acNum" label="通过总题数">
+          {{ questionform.acNum }}
+        </a-form-item>
+        <a-form-item field="submitNum" label="提交总数">
+          {{ questionform.submitNum }}
+        </a-form-item>
+        <a-form-item field="questionPassRate" label="通过率">
+          <template v-if="questionform.submitNum === 0"> 0 </template>
+          <template v-else>
+            {{ questionform.acNum / questionform.submitNum }}</template
+          >
+        </a-form-item>
+      </a-form>
       <a-form-item>
         <a-button type="primary" style="width: 120px" @click="router.push('/')">
           返回
@@ -31,7 +50,10 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from "vue";
-import { UserControllerService } from "../../../generated";
+import {
+  QuestionControllerService,
+  UserControllerService,
+} from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -46,6 +68,11 @@ const form = reactive({
   userName: "",
   userAvatar: "",
   userProfile: "",
+});
+
+const questionform = reactive({
+  acNum: "0",
+  submitNum: "0",
 });
 /**
  * 提交表单
@@ -64,7 +91,8 @@ const handleSubmit = async () => {
  */
 const loadData = async () => {
   const res = await UserControllerService.getLoginUserUsingGet();
-  if (res.code === 0) {
+  const userRankRes = await QuestionControllerService.getUserRankUsingGet();
+  if (res.code === 0 && userRankRes.code === 0) {
     if (res.data?.userName) {
       form.userName = res.data.userName;
     }
@@ -74,8 +102,18 @@ const loadData = async () => {
     if (res.data?.userProfile) {
       form.userProfile = res.data.userProfile;
     }
+    if (userRankRes.data?.acNum) {
+      questionform.acNum = userRankRes.data.acNum as any;
+    }
+    if (userRankRes.data?.submitNum) {
+      questionform.submitNum = userRankRes.data.submitNum as any;
+    }
+    message.success("加载成功");
   } else {
     message.error("加载失败" + res.message);
+    message.error("请重新登录");
+    router.push("/user/login");
+    return;
   }
 };
 onMounted(() => {

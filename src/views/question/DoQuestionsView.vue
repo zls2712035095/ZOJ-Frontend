@@ -33,10 +33,134 @@
             </a-card>
           </a-tab-pane>
           <a-tab-pane key="comment" title="评论">
-            Content of Tab Panel 2
+            <dic>
+              <a-comment
+                align="right"
+                avatar="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
+              >
+                <template #actions>
+                  <a-button type="secondary" @click="restartComment">
+                    取消</a-button
+                  >
+                  <a-button type="primary" @click="submitNewComment">
+                    提交</a-button
+                  >
+                </template>
+                <template #content>
+                  <a-input
+                    v-model="addComment.content"
+                    placeholder="输入评论"
+                  />
+                </template>
+              </a-comment>
+              <div>
+                <template v-for="(root, index) in formComment" :key="index">
+                  <a-comment
+                    :author="root.userName"
+                    avatar="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
+                    :content="root.content"
+                    :datetime="
+                      moment(root.createTime).format('YYYY-MM-DD HH:mm:ss')
+                    "
+                  >
+                    <template #actions>
+                      <span class="action">
+                        <a-space>
+                          <a-collapse>
+                            <a-collapse-item header="回复">
+                              <a-comment
+                                align="right"
+                                avatar="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
+                              >
+                                <template #actions>
+                                  <a-button
+                                    type="secondary"
+                                    @click="restartComment"
+                                  >
+                                    取消</a-button
+                                  >
+                                  <a-button
+                                    type="primary"
+                                    @click="replyComment(root)"
+                                  >
+                                    回复</a-button
+                                  >
+                                </template>
+                                <template #content>
+                                  <a-input
+                                    v-model="addComment.content"
+                                    placeholder="输入评论"
+                                  />
+                                </template>
+                              </a-comment>
+                            </a-collapse-item>
+                          </a-collapse>
+                        </a-space>
+                      </span>
+                    </template>
+
+                    <div>
+                      <template
+                        v-for="(item, index) in root.childrenComment"
+                        :key="index"
+                      >
+                        <a-comment
+                          :author="item.userName"
+                          avatar="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/9eeb1800d9b78349b24682c3518ac4a3.png~tplv-uwbnlip3yd-webp.webp"
+                          :content="item.content"
+                          :datetime="
+                            moment(item.createTime).format(
+                              'YYYY-MM-DD HH:mm:ss'
+                            )
+                          "
+                        >
+                          <template #actions>
+                            <span class="action">
+                              <a-space>
+                                <a-collapse>
+                                  <a-collapse-item header="回复">
+                                    <a-comment
+                                      align="right"
+                                      avatar="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
+                                    >
+                                      <template #actions>
+                                        <a-button
+                                          type="secondary"
+                                          @click="restartComment"
+                                        >
+                                          取消</a-button
+                                        >
+                                        <a-button
+                                          type="primary"
+                                          @click="replyComment(item)"
+                                        >
+                                          回复</a-button
+                                        >
+                                      </template>
+                                      <template #content>
+                                        <a-input
+                                          v-model="addComment.content"
+                                          placeholder="输入评论"
+                                        />
+                                      </template>
+                                    </a-comment>
+                                  </a-collapse-item>
+                                </a-collapse>
+                              </a-space>
+                            </span>
+                          </template>
+                        </a-comment>
+                      </template>
+                    </div>
+                  </a-comment>
+                </template>
+              </div>
+            </dic>
           </a-tab-pane>
           <a-tab-pane key="answer" title="题解">
-            {{ (question && question.answer) || "暂时无法查看该题解" }}
+            <MdViewer
+              :value="(question && question.answer) || '暂时无法查看该题解'"
+            />
           </a-tab-pane>
         </a-tabs>
       </a-col>
@@ -69,15 +193,27 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, withDefaults, defineProps } from "vue";
+import { onMounted, ref, withDefaults, defineProps, reactive } from "vue";
 import {
+  CommentAddRequest,
+  CommentControllerService,
+  CommentQueryRequest,
+  Comments,
   QuestionControllerService,
   QuestionSubmitAddRequest,
   QuestionVO,
+  User,
+  UserControllerService,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import CodeEditor from "@/components/CodeEditor.vue";
 import MdViewer from "@/components/MdViewer.vue";
+import moment from "moment";
+
+const addComment = reactive<CommentAddRequest>({});
+const formComment = ref<Comments[]>([] as Comments[]);
+const query = reactive<CommentQueryRequest>({});
+const currentUser = ref<User>({});
 
 interface Props {
   id: string;
@@ -99,6 +235,21 @@ const loadData = async () => {
   } else {
     message.error("题目加载失败" + res.message);
   }
+  const resComment = await CommentControllerService.listCommentsByPageUsingPost(
+    {
+      ...query,
+      foreignId: props.id as any,
+      sortField: "creatTime",
+    }
+  );
+  const resUser = await UserControllerService.getLoginUserUsingGet();
+  if (res.code === 0) {
+    console.log(res);
+    formComment.value = resComment.data.records as Comments[];
+    currentUser.value = resUser.data as User;
+  } else {
+    message.error("加载评论失败" + res.message);
+  }
 };
 
 /**
@@ -107,6 +258,56 @@ const loadData = async () => {
 onMounted(() => {
   loadData();
 });
+
+/**
+ * 添加新评论
+ */
+const submitNewComment = async () => {
+  const res = await CommentControllerService.addCommentUsingPost({
+    ...addComment,
+    foreignId: props.id as any,
+    userId: currentUser.value.id,
+    userName: currentUser.value.userName,
+  });
+  if (res.code === 0) {
+    loadData();
+    console.log(res);
+    console.log("foreignId:" + props.id);
+    addComment.content = "";
+  } else {
+    message.error("评论失败！", res.message);
+  }
+};
+/**
+ * 回复评论
+ * @param comment
+ */
+const replyComment = async (comment: Comments) => {
+  console.log(addComment);
+  const res = await CommentControllerService.addCommentUsingPost({
+    ...addComment,
+    foreignId: props.id as any,
+    userId: currentUser.value.id,
+    userName: currentUser.value.userName,
+    pid: comment.id,
+  });
+  if (res.code === 0) {
+    loadData();
+    console.log(res);
+    console.log("pid:" + comment.pid);
+    console.log("foreignId:" + props.id);
+    addComment.content = "";
+  } else {
+    message.error("评论失败！", res.message);
+  }
+};
+
+/**
+ * 清楚内容
+ */
+const restartComment = () => {
+  addComment.content = "";
+};
 
 const form = ref<QuestionSubmitAddRequest>({
   questionId: "" as any,

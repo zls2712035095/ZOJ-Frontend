@@ -7,10 +7,12 @@ import type { BaseResponse_long_ } from "../models/BaseResponse_long_";
 import type { BaseResponse_Page_Question_ } from "../models/BaseResponse_Page_Question_";
 import type { BaseResponse_Page_QuestionSubmitVO_ } from "../models/BaseResponse_Page_QuestionSubmitVO_";
 import type { BaseResponse_Page_QuestionVO_ } from "../models/BaseResponse_Page_QuestionVO_";
+import type { BaseResponse_Page_UserRank_ } from "../models/BaseResponse_Page_UserRank_";
 import type { BaseResponse_Question_ } from "../models/BaseResponse_Question_";
 import type { BaseResponse_QuestionSubmit_ } from "../models/BaseResponse_QuestionSubmit_";
 import type { BaseResponse_QuestionSubmitVO_ } from "../models/BaseResponse_QuestionSubmitVO_";
 import type { BaseResponse_QuestionVO_ } from "../models/BaseResponse_QuestionVO_";
+import type { BaseResponse_UserRank_ } from "../models/BaseResponse_UserRank_";
 import type { DeleteRequest } from "../models/DeleteRequest";
 import type { QuestionAddRequest } from "../models/QuestionAddRequest";
 import type { QuestionEditRequest } from "../models/QuestionEditRequest";
@@ -18,6 +20,7 @@ import type { QuestionQueryRequest } from "../models/QuestionQueryRequest";
 import type { QuestionSubmitAddRequest } from "../models/QuestionSubmitAddRequest";
 import type { QuestionSubmitQueryRequest } from "../models/QuestionSubmitQueryRequest";
 import type { QuestionUpdateRequest } from "../models/QuestionUpdateRequest";
+import type { UserRankQueryRequest } from "../models/UserRankQueryRequest";
 import type { CancelablePromise } from "../core/CancelablePromise";
 import { OpenAPI } from "../core/OpenAPI";
 import { request as __request } from "../core/request";
@@ -305,6 +308,45 @@ export class QuestionControllerService {
       method: "POST",
       url: "/api/question/update",
       body: questionUpdateRequest,
+      errors: {
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        404: `Not Found`,
+      },
+    });
+  }
+
+  /**
+   * getUserRank
+   * @returns BaseResponse_UserRank_ OK
+   * @throws ApiError
+   */
+  public static getUserRankUsingGet(): CancelablePromise<BaseResponse_UserRank_> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/question/userrank/get",
+      errors: {
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        404: `Not Found`,
+      },
+    });
+  }
+
+  /**
+   * listUserRankByPage
+   * @param userRankQueryRequest userRankQueryRequest
+   * @returns BaseResponse_Page_UserRank_ OK
+   * @returns any Created
+   * @throws ApiError
+   */
+  public static listUserRankByPageUsingPost(
+    userRankQueryRequest: UserRankQueryRequest
+  ): CancelablePromise<BaseResponse_Page_UserRank_ | any> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/question/userrank/list/page",
+      body: userRankQueryRequest,
       errors: {
         401: `Unauthorized`,
         403: `Forbidden`,

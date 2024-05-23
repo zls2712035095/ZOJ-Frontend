@@ -18,6 +18,14 @@ import UserInfoMessageView from "@/views/user/UserInfoMessageView.vue";
 import ManageUserView from "@/views/user/ManageUserView.vue";
 import ExampleView from "@/views/ExampleView.vue";
 import UserUpdateByAdminView from "@/views/user/UserUpdateByAdminView.vue";
+import RankView from "@/views/question/RankView.vue";
+import UserAddView from "@/views/user/UserAddView.vue";
+import AboutView from "@/views/AboutView.vue";
+import QuestionListView from "@/views/question/QuestionListView.vue";
+import AddQuestionListView from "@/views/question/AddQuestionListView.vue";
+import ManageQuestionListView from "@/views/question/ManageQuestionListView.vue";
+import QuestionListQuestionView from "@/views/question/QuestionListQuestionView.vue";
+import QuestionListDoQuestionView from "@/views/question/QuestionListDoQuestionView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   // todo 嵌套路由改造 -》嵌套菜单
@@ -35,6 +43,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/user/register",
         name: "用户注册",
         component: UserRegisterView,
+      },
+      {
+        path: "/user/add",
+        name: "添加用户",
+        component: UserAddView,
       },
       {
         path: "/user/infomessage",
@@ -81,9 +94,24 @@ export const routes: Array<RouteRecordRaw> = [
     component: QuestionsView,
   },
   {
+    path: "/questionList",
+    name: "题单",
+    component: QuestionListView,
+  },
+  {
     path: "/view/question/:id",
     name: "做题页面",
     component: DoQuestionsView,
+    props: true,
+    meta: {
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
+    },
+  },
+  {
+    path: "/view/questionList/do/:id",
+    name: "题单中做题页面",
+    component: QuestionListDoQuestionView,
     props: true,
     meta: {
       access: ACCESS_ENUM.USER,
@@ -118,9 +146,36 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/add/questionList",
+    name: "创建题单",
+    component: AddQuestionListView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+    },
+  },
+  {
     path: "/update/question",
     name: "更新题目",
     component: AddQuestionView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
+    },
+  },
+  {
+    path: "/view/questionList/:id",
+    name: "查看题单页面",
+    component: QuestionListQuestionView,
+    props: true,
+    meta: {
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
+    },
+  },
+  {
+    path: "/update/questionList",
+    name: "更新题单",
+    component: AddQuestionListView,
     meta: {
       access: ACCESS_ENUM.USER,
       hideInMenu: true,
@@ -131,8 +186,21 @@ export const routes: Array<RouteRecordRaw> = [
     name: "管理题目",
     component: ManageQuestionView,
     meta: {
-      access: ACCESS_ENUM.ADMIN,
+      access: ACCESS_ENUM.USER,
     },
+  },
+  {
+    path: "/manage/questionList",
+    name: "管理题单",
+    component: ManageQuestionListView,
+    meta: {
+      access: ACCESS_ENUM.USER,
+    },
+  },
+  {
+    path: "/rank",
+    name: "排行榜",
+    component: RankView,
   },
   // {
   //   path: "/hide",
@@ -145,7 +213,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/noAuth",
     name: "无权限",
-    component: ExampleView,
+    component: NoAuthView,
     meta: {
       hideInMenu: true,
     },
@@ -158,13 +226,12 @@ export const routes: Array<RouteRecordRaw> = [
   //     access: ACCESS_ENUM.ADMIN,
   //   },
   // },
-  // {
-  //   path: "/about",
-  //   name: "我的",
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () =>
-  //     import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  // },
+  {
+    path: "/about",
+    name: "我的",
+    component: AboutView,
+    meta: {
+      hideInMenu: false,
+    },
+  },
 ];

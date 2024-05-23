@@ -2,22 +2,20 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { JudgeConfig } from './JudgeConfig';
-import type { UserVO } from './UserVO';
-export type QuestionVO = {
-    acceptNum?: number;
-    answer?: string;
+import type { Comment } from './Comment';
+export type CommentUpdateRequest = {
+    childrenComment?: Array<Comment>;
     content?: string;
     createTime?: string;
     favourNum?: number;
+    foreignId?: number;
     id?: number;
-    judgeConfig?: JudgeConfig;
-    submitNum?: number;
-    tags?: Array<string>;
+    isDelete?: number;
+    pid?: number;
+    target?: string;
     thumbNum?: number;
-    title?: string;
     updateTime?: string;
     userId?: number;
-    userVO?: UserVO;
+    userName?: string;
 };
 

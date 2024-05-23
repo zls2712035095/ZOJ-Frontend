@@ -2,12 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UserUpdateRequest = {
+export type UserRankQueryRequest = {
+    acNum?: number;
+    current?: number;
     id?: number;
-    userAvatar?: string;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    submitNum?: number;
+    userId?: number;
     userName?: string;
-    userPassword?: string;
     userProfile?: string;
-    userRole?: string;
 };
 

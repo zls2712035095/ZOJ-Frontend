@@ -1,6 +1,6 @@
 <template>
   <div id="userRegisterView">
-    <h2 style="margin-bottom: 16px">注册</h2>
+    <h2 style="margin-bottom: 16px">添加用户</h2>
     <a-form
       style="max-width: 480px; margin: 0 auto"
       label-align="left"
@@ -37,31 +37,19 @@
       >
         <a-input-password
           v-model="form.userPassword"
-          placeholder="请输⼊密码"
-        />
-      </a-form-item>
-      <a-form-item
-        :rules="[
-          { required: true, message: '密码不能为空' },
-          { minLength: 8, message: '密码⻓度不能低于8位' },
-        ]"
-        :validate-trigger="['change', 'input']"
-        field="checkPassword"
-        tooltip="密码不少于8位"
-        label="重复密码"
-      >
-        <a-input-password
-          v-model="form.checkPassword"
-          placeholder="请重复输⼊密码"
+          placeholder="密码默认为12345678"
         />
       </a-form-item>
       <a-form-item>
-        <a-button
-          type="primary"
-          style="width: 120px; margin: 0 auto"
-          html-type="submit"
-          >注册
-        </a-button>
+        <a-space>
+          <a-button type="primary" href="/user/adminmanager">返回</a-button>
+          <a-button
+            type="primary"
+            style="width: 120px; margin: 0 auto"
+            html-type="submit"
+            >添加
+          </a-button>
+        </a-space>
       </a-form-item>
     </a-form>
   </div>
@@ -81,34 +69,25 @@ const store = useStore();
  */
 const form = reactive({
   userAccount: "",
-  userPassword: "",
-  checkPassword: "",
+  userPassword: "12345678",
+  checkPassword: "12345678",
   userName: "",
 } as UserRegisterRequest);
 /**
  * 提交表单
  */
 const handleSubmit = async () => {
-  // 提前判断密码和重复密码是否相同
-  if (
-    form.userPassword?.length !== form.checkPassword?.length ||
-    form.userPassword !== form.checkPassword
-  ) {
-    message.error("两次输⼊的密码不⼀致");
-    return;
-  }
   const res = await UserControllerService.userRegisterUsingPost(form);
-  console.log(res);
   // 注册成功，跳转到登录⻚⾯
   if (res.code === 0) {
-    message.success("注册成功！");
+    message.success("添加成功！");
     await store.dispatch("getLoginUser");
     router.push({
-      path: "/user/login",
+      path: "/user/adminmanager",
       replace: true,
     });
   } else {
-    message.error("注册失败，" + res.message);
+    message.error("添加失败，" + res.message);
   }
 };
 </script>

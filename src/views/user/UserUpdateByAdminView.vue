@@ -57,6 +57,7 @@ const router = useRouter();
  * 表单信息
  */
 const form = reactive({
+  id: props.id as any,
   userName: "未设置昵称",
   userAvatar: "",
   userProfile: "未设置简介",
@@ -65,7 +66,7 @@ const form = reactive({
  * 提交表单
  */
 const handleSubmit = async () => {
-  const res = await UserControllerService.updateMyUserUsingPost(form);
+  const res = await UserControllerService.updateUserUsingPost(form);
   if (res.code === 0) {
     message.success("更新成功");
   } else {

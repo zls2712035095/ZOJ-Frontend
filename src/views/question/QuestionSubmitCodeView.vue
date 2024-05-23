@@ -109,7 +109,6 @@ const loadData = async () => {
     console.log(res.data);
     question.value = res.data?.questionVO;
     questionSubmit.code = res.data?.code;
-    questionSubmit.code = res.data?.code;
     if (res.data?.code) {
       form.code = res.data.code;
     }

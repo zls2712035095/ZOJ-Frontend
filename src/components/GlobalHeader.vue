@@ -123,7 +123,7 @@
               </template>
             </template>
           </a-dropdown>
-          {{ store.state.user?.loginUser?.userName ?? "未登录" }}
+          {{ store.state.user?.loginUser?.userName ?? "未设置昵称或未登录" }}
         </a-space>
       </div>
     </a-col>
