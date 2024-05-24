@@ -1,5 +1,5 @@
 <template>
-  <div id="addQuestionListView">
+  <div id="addQuestionView">
     <template v-if="updatePage">
       <h2 align="center">修改题单</h2>
     </template>
@@ -14,29 +14,25 @@
         <a-input-tag v-model="form.tags" placeholder="请设置标签" allow-clear />
       </a-form-item>
       <a-form-item field="content" label="题单内容">
-        <MdEditor
-          :value="form.content as string"
-          :handle-change="onContentChange"
-        />
+        <MdEditor :value="form.content" :handle-change="onContentChange" />
       </a-form-item>
-
       <a-form-item label="题单用例" :content-flex="false" :merge-props="false">
         <a-form-item
-          v-for="(judgeCaseItem, index) of questionIdList"
-          :field="`form.judgeCase[${index}]`"
+          v-for="(judgeCaseItem, index) of form.questionCase"
+          :field="`form.questionCase[${index}].input`"
           :label="`题目用例-${index}`"
           :key="index"
           no-style
         >
-          <a-space direction="vertical" style="min-width: 800px">
+          <a-space direction="vertical" style="min-width: 640px">
             <a-form-item
-              :field="`questionIdList[${index}]`"
-              :label="`输入题单用例（题号）${index}`"
+              :field="`form.questionCase[${index}].input`"
+              :label="`输入用例-${index}`"
               :key="index"
             >
               <a-input
-                v-model="questionCase[index]"
-                placeholder="请输入题单（题号）"
+                v-model="judgeCaseItem.input"
+                placeholder="请输入测试输入用例"
               />
             </a-form-item>
             <a-button status="danger" @click="handleDelete(index)"
@@ -64,11 +60,9 @@
 import { onMounted, reactive } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
 import {
+  QuestionControllerService,
+  QuestionCase,
   QuestionListControllerService,
-  QuestionListAddRequest,
-  Question,
-  QuestionListEditRequest,
-  QuestionListVO,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRoute } from "vue-router";
@@ -83,10 +77,12 @@ let form = ref({
   title: "",
   tags: [],
   content: "",
-  questionCase: [] as Question[],
-} as QuestionListVO);
-
-const questionIdList = ref([]);
+  questionCase: [
+    {
+      input: "",
+    },
+  ],
+});
 
 /**
  * 根据题目 id 获取老的数据
@@ -96,22 +92,26 @@ const loadData = async () => {
   if (!id) {
     return;
   }
-  const res = await QuestionListControllerService.getQuestionListVoByIdUsingGet(
+  const res = await QuestionListControllerService.getQuestionListByIdUsingGet(
     id as any
   );
   if (res.code === 0) {
     form.value = res.data as any;
     console.log(form.value);
     //Json 转 js 对象
-    if (!form.value.questionCase) {
-      form.value.questionCase = [] as any;
-    } else {
-      form.value.questionCase = JSON.parse(form.value.questionCase as any);
-    }
-    if (!form.value.tags) {
-      form.value.tags = [];
-    }
-    // else {
+    // if (!form.value.questionCase) {
+    //   form.value.questionCase = [
+    //     {
+    //       input: "",
+    //     },
+    //   ];
+    // } else {
+    //   //console.log(form.value.questioneCase);
+    //   form.value.questionCase = JSON.parse(form.value.questionCase as any);
+    // }
+    // if (!form.value.tags) {
+    //   form.value.tags = [];
+    // } else {
     //   form.value.tags = JSON.parse(form.value.tags as any);
     // }
   } else {
@@ -127,20 +127,18 @@ const doSubmit = async () => {
   console.log(form.value);
   //判断当前页面时创建还是更新
   if (updatePage) {
-    const res = await QuestionListControllerService.editQuestionListUsingPost({
-      ...form.value,
-      questionCase: questionIdList.value as number[],
-    });
+    const res = await QuestionListControllerService.editQuestionListUsingPost(
+      form.value as any
+    );
     if (res.code === 0) {
       message.success("更新成功");
     } else {
       message.error("更新失败" + res.message);
     }
   } else {
-    const res = await QuestionListControllerService.addQuestionListUsingPost({
-      ...form.value,
-      questionCase: questionIdList.value as number[],
-    });
+    const res = await QuestionListControllerService.addQuestionListUsingPost(
+      form.value as any
+    );
     if (res.code === 0) {
       message.success("创建成功");
     } else {
@@ -152,14 +150,16 @@ const doSubmit = async () => {
  * 新增题目用例
  */
 const handleAdd = () => {
-  questionIdList.value.push({});
+  form.value.questionCase.push({
+    input: "",
+  });
 };
 /**
  * 删除题目用例
  * @param index
  */
 const handleDelete = (index: number) => {
-  questionIdList.value.splice(index, 1);
+  form.value.questionCase.splice(index, 1);
 };
 
 const onContentChange = (value: string) => {

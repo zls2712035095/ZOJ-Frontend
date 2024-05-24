@@ -231,7 +231,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "我的",
     component: AboutView,
     meta: {
-      hideInMenu: false,
+      hideInMenu: true,
     },
   },
 ];

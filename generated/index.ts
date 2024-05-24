@@ -70,6 +70,7 @@ export type { PostUpdateRequest } from './models/PostUpdateRequest';
 export type { PostVO } from './models/PostVO';
 export type { Question } from './models/Question';
 export type { QuestionAddRequest } from './models/QuestionAddRequest';
+export type { QuestionCase } from './models/QuestionCase';
 export type { QuestionEditRequest } from './models/QuestionEditRequest';
 export type { QuestionList } from './models/QuestionList';
 export type { QuestionListAddRequest } from './models/QuestionListAddRequest';
