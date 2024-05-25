@@ -28,8 +28,13 @@
         </a-button>
       </a-form-item>
       <a-form-item>
+        <a-button type="outline" shape="round" status="normal" href="/user/add"
+          >新增用户
+        </a-button>
+      </a-form-item>
+      <a-form-item>
         <a-button type="outline" shape="round" status="normal" href="/"
-          >返回
+          >返 回
         </a-button>
       </a-form-item>
     </a-form>

@@ -32,9 +32,9 @@
       </template>
       <template #acRate="{ record }">
         {{
-          `${record.submitNum ? record.acceptNum / record.submitNum : "0"}% (${
-            record.acceptNum
-          }/${record.submitNum})`
+          `${
+            record.submitNum ? (record.acceptNum * 100) / record.submitNum : "0"
+          }% (${record.acceptNum}/${record.submitNum})`
         }}
       </template>
       <template #createTime="{ record }">
