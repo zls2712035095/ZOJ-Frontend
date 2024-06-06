@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuestionList } from './QuestionList';
-export type BaseResponse_QuestionList_ = {
+import type { QuestionListUpdateRequest } from './QuestionListUpdateRequest';
+export type BaseResponse_QuestionListUpdateRequest_ = {
     code?: number;
-    data?: QuestionList;
+    data?: QuestionListUpdateRequest;
     message?: string;
 };
 

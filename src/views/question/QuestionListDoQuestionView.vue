@@ -72,7 +72,6 @@
 import { onMounted, ref, withDefaults, defineProps, reactive } from "vue";
 import {
   CommentAddRequest,
-  CommentControllerService,
   CommentQueryRequest,
   Comments,
   QuestionControllerService,
@@ -111,13 +110,12 @@ const loadData = async () => {
   } else {
     message.error("题目加载失败" + res.message);
   }
-  const resComment = await CommentControllerService.listCommentsByPageUsingPost(
-    {
+  const resComment =
+    await QuestionControllerService.listCommentsByPageUsingPost({
       ...query,
       foreignId: props.id as any,
       sortField: "creatTime",
-    }
-  );
+    });
   const resUser = await UserControllerService.getLoginUserUsingGet();
   if (res.code === 0) {
     console.log(res);
@@ -139,7 +137,7 @@ onMounted(() => {
  * 添加新评论
  */
 const submitNewComment = async () => {
-  const res = await CommentControllerService.addCommentUsingPost({
+  const res = await QuestionControllerService.addCommentUsingPost({
     ...addComment,
     foreignId: props.id as any,
     userId: currentUser.value.id,
@@ -160,7 +158,7 @@ const submitNewComment = async () => {
  */
 const replyComment = async (comment: Comments) => {
   console.log(addComment);
-  const res = await CommentControllerService.addCommentUsingPost({
+  const res = await QuestionControllerService.addCommentUsingPost({
     ...addComment,
     foreignId: props.id as any,
     userId: currentUser.value.id,

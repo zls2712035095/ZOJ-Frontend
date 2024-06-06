@@ -85,12 +85,15 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/",
-    name: "主页",
+    name: "主页 ",
     component: QuestionsView,
+    meta: {
+      hideInMenu: true,
+    },
   },
   {
     path: "/questions",
-    name: "题库",
+    name: "主页",
     component: QuestionsView,
   },
   {
@@ -120,7 +123,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/view/question_submit",
-    name: "题目提交页面",
+    name: "提交榜",
     component: QuestionSubmitView,
     props: true,
     meta: {

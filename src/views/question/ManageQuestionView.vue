@@ -117,10 +117,6 @@ const columns = [
     slotName: "tags",
   },
   {
-    title: "答案",
-    dataIndex: "answer",
-  },
-  {
     title: "提交总数",
     dataIndex: "submitNum",
   },

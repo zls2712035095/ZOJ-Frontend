@@ -1,5 +1,16 @@
 <template>
   <div id="manageQuestionListView">
+    <a-form :model="searchParams" layout="inline">
+      <a-form-item field="title" label="题单名称" style="min-width: 240px">
+        <a-input v-model="searchParams.title" placeholder="请输入题单名称" />
+      </a-form-item>
+      <a-form-item field="tags" label="标签" style="min-width: 240px">
+        <a-input-tag v-model="searchParams.tags" placeholder="请输入标签" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="doSubmit">搜索</a-button>
+      </a-form-item>
+    </a-form>
     <a-table
       :columns="columns"
       :data="dataList"
@@ -43,11 +54,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from "vue";
-import {
-  Question,
-  QuestionControllerService,
-  QuestionListControllerService,
-} from "../../../generated";
+import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 import ACCESS_ENUM from "@/access/ACCESS_ENUM";
@@ -66,7 +73,7 @@ const searchParams = ref({
 const loadData = async () => {
   if (store.state.user?.loginUser.userRole === ACCESS_ENUM.USER) {
     const res =
-      await QuestionListControllerService.listMyQuestionListVoByPageUsingPost(
+      await QuestionControllerService.listMyQuestionListVoByPageUsingPost(
         searchParams.value
       );
     if (res.code === 0) {
@@ -77,7 +84,7 @@ const loadData = async () => {
     }
   } else {
     const res =
-      await QuestionListControllerService.listQuestionListVoByPageUsingPost(
+      await QuestionControllerService.listQuestionListVoByPageUsingPost(
         searchParams.value
       );
     if (res.code === 0) {
@@ -151,7 +158,7 @@ const onPageChange = (page: number) => {
 };
 
 const doDelete = async (question: Question) => {
-  const res = await QuestionListControllerService.deleteQuestionListUsingPost({
+  const res = await QuestionControllerService.deleteQuestionListUsingPost({
     id: question.id,
   });
   if (res.code === 0) {
@@ -171,6 +178,16 @@ const doUpdate = (question: Question) => {
       id: question.id,
     },
   });
+};
+/**
+ * 搜索题单,重新加载数据
+ */
+const doSubmit = () => {
+  //重置搜索页号
+  searchParams.value = {
+    ...searchParams.value,
+    current: 1,
+  };
 };
 </script>
 

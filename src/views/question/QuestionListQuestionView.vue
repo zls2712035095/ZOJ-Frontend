@@ -59,7 +59,7 @@ import { defineProps, onMounted, ref, watchEffect, withDefaults } from "vue";
 import {
   Question,
   QuestionListQueryRequest,
-  QuestionListControllerService,
+  QuestionControllerService,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
@@ -83,7 +83,7 @@ const searchParams = ref<QuestionListQueryRequest>({
 });
 
 const loadData = async () => {
-  const res = await QuestionListControllerService.getQuestionListVoByIdUsingGet(
+  const res = await QuestionControllerService.getQuestionListVoByIdUsingGet(
     props.id as any
   );
   if (res.code === 0) {

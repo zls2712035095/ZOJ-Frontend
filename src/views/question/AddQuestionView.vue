@@ -120,7 +120,7 @@ let form = ref({
   title: "",
   tags: [],
   judgeConfig: {
-    memoryLimit: 1000,
+    memoryLimit: 1000000,
     stackLimit: 1000,
     timeLimit: 1000,
   },

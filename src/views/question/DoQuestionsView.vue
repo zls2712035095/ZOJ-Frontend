@@ -40,11 +40,11 @@
               >
                 <template #actions>
                   <a-button type="secondary" @click="restartComment">
-                    取消</a-button
-                  >
+                    取消
+                  </a-button>
                   <a-button type="primary" @click="submitNewComment">
-                    提交</a-button
-                  >
+                    提交
+                  </a-button>
                 </template>
                 <template #content>
                   <a-input
@@ -172,9 +172,9 @@
               :style="{ width: '320px' }"
               placeholder="编程语言"
             >
-              <a-option>cpp</a-option>
+              <!--              <a-option>cpp</a-option>-->
               <a-option>java</a-option>
-              <a-option>golang</a-option>
+              <!--              <a-option>golang</a-option>-->
             </a-select>
           </a-form-item>
         </a-form>
@@ -196,7 +196,6 @@
 import { onMounted, ref, withDefaults, defineProps, reactive } from "vue";
 import {
   CommentAddRequest,
-  CommentControllerService,
   CommentQueryRequest,
   Comments,
   QuestionControllerService,
@@ -235,13 +234,12 @@ const loadData = async () => {
   } else {
     message.error("题目加载失败" + res.message);
   }
-  const resComment = await CommentControllerService.listCommentsByPageUsingPost(
-    {
+  const resComment =
+    await QuestionControllerService.listCommentsByPageUsingPost({
       ...query,
       foreignId: props.id as any,
       sortField: "creatTime",
-    }
-  );
+    });
   const resUser = await UserControllerService.getLoginUserUsingGet();
   if (res.code === 0) {
     console.log(res);
@@ -263,7 +261,7 @@ onMounted(() => {
  * 添加新评论
  */
 const submitNewComment = async () => {
-  const res = await CommentControllerService.addCommentUsingPost({
+  const res = await QuestionControllerService.addCommentUsingPost({
     ...addComment,
     foreignId: props.id as any,
     userId: currentUser.value.id,
@@ -284,7 +282,7 @@ const submitNewComment = async () => {
  */
 const replyComment = async (comment: Comments) => {
   console.log(addComment);
-  const res = await CommentControllerService.addCommentUsingPost({
+  const res = await QuestionControllerService.addCommentUsingPost({
     ...addComment,
     foreignId: props.id as any,
     userId: currentUser.value.id,

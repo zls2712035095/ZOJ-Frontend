@@ -26,7 +26,7 @@ export type { BaseResponse_Page_UserRank_ } from './models/BaseResponse_Page_Use
 export type { BaseResponse_Page_UserVO_ } from './models/BaseResponse_Page_UserVO_';
 export type { BaseResponse_PostVO_ } from './models/BaseResponse_PostVO_';
 export type { BaseResponse_Question_ } from './models/BaseResponse_Question_';
-export type { BaseResponse_QuestionList_ } from './models/BaseResponse_QuestionList_';
+export type { BaseResponse_QuestionListUpdateRequest_ } from './models/BaseResponse_QuestionListUpdateRequest_';
 export type { BaseResponse_QuestionListVO_ } from './models/BaseResponse_QuestionListVO_';
 export type { BaseResponse_QuestionSubmit_ } from './models/BaseResponse_QuestionSubmit_';
 export type { BaseResponse_QuestionSubmitVO_ } from './models/BaseResponse_QuestionSubmitVO_';
@@ -96,12 +96,10 @@ export type { UserUpdateMyRequest } from './models/UserUpdateMyRequest';
 export type { UserUpdateRequest } from './models/UserUpdateRequest';
 export type { UserVO } from './models/UserVO';
 
-export { CommentControllerService } from './services/CommentControllerService';
 export { FileService } from './services/FileService';
 export { PostControllerService } from './services/PostControllerService';
 export { PostFavourControllerService } from './services/PostFavourControllerService';
 export { PostThumbControllerService } from './services/PostThumbControllerService';
 export { QuestionControllerService } from './services/QuestionControllerService';
-export { QuestionListControllerService } from './services/QuestionListControllerService';
 export { UserControllerService } from './services/UserControllerService';
 export { WxMpControllerService } from './services/WxMpControllerService';

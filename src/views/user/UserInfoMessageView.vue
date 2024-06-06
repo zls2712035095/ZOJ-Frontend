@@ -34,8 +34,17 @@
         <a-form-item field="questionPassRate" label="通过率">
           <template v-if="questionform.submitNum === 0"> 0% </template>
           <template v-else>
-            {{ (questionform.acNum * 100) / questionform.submitNum }}%</template
-          >
+            {{
+              questionform.submitNum
+                ? `${(
+                    (questionform.acNum * 100) /
+                    questionform.submitNum
+                  ).toFixed(2)}% (${questionform.acNum}/${
+                    questionform.submitNum
+                  })`
+                : "0%"
+            }}
+          </template>
         </a-form-item>
       </a-form>
       <a-form-item>

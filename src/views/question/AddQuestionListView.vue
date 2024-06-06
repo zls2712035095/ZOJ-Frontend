@@ -32,7 +32,7 @@
             >
               <a-input
                 v-model="judgeCaseItem.input"
-                placeholder="请输入测试输入用例"
+                placeholder="请输入题目题号"
               />
             </a-form-item>
             <a-button status="danger" @click="handleDelete(index)"
@@ -59,11 +59,7 @@
 <script setup lang="ts">
 import { onMounted, reactive } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
-import {
-  QuestionControllerService,
-  QuestionCase,
-  QuestionListControllerService,
-} from "../../../generated";
+import { QuestionCase, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRoute } from "vue-router";
 import { ref } from "vue";
@@ -92,7 +88,7 @@ const loadData = async () => {
   if (!id) {
     return;
   }
-  const res = await QuestionListControllerService.getQuestionListByIdUsingGet(
+  const res = await QuestionControllerService.getQuestionListByIdUsingGet(
     id as any
   );
   if (res.code === 0) {
@@ -127,7 +123,7 @@ const doSubmit = async () => {
   console.log(form.value);
   //判断当前页面时创建还是更新
   if (updatePage) {
-    const res = await QuestionListControllerService.editQuestionListUsingPost(
+    const res = await QuestionControllerService.editQuestionListUsingPost(
       form.value as any
     );
     if (res.code === 0) {
@@ -136,7 +132,7 @@ const doSubmit = async () => {
       message.error("更新失败" + res.message);
     }
   } else {
-    const res = await QuestionListControllerService.addQuestionListUsingPost(
+    const res = await QuestionControllerService.addQuestionListUsingPost(
       form.value as any
     );
     if (res.code === 0) {

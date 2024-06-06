@@ -14,9 +14,11 @@
     >
       <template #acRate="{ record }">
         {{
-          `${
-            record.submitNum ? (record.acNum * 100) / record.submitNum : "0"
-          }% (${record.acNum}/${record.submitNum})`
+          record.submitNum
+            ? `${((record.acNum * 100) / record.submitNum).toFixed(2)}% (${
+                record.acNum
+              }/${record.submitNum})`
+            : "0%"
         }}
       </template>
     </a-table>

@@ -49,7 +49,6 @@ import { onMounted, ref, watchEffect } from "vue";
 import {
   Question,
   QuestionControllerService,
-  QuestionListControllerService,
   QuestionListQueryRequest,
   QuestionListVO,
 } from "../../../generated";
@@ -67,10 +66,9 @@ const searchParams = ref<QuestionListQueryRequest>({
 });
 
 const loadData = async () => {
-  const res =
-    await QuestionListControllerService.listQuestionListVoByPageUsingPost(
-      searchParams.value
-    );
+  const res = await QuestionControllerService.listQuestionListVoByPageUsingPost(
+    searchParams.value
+  );
   if (res.code === 0) {
     dataList.value = res.data.records;
     total.value = res.data.total;

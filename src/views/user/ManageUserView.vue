@@ -33,7 +33,7 @@
         </a-button>
       </a-form-item>
       <a-form-item>
-        <a-button type="outline" shape="round" status="normal" href="/"
+        <a-button type="outline" shape="round" status="normal" href="/questions"
           >返 回
         </a-button>
       </a-form-item>
